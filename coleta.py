@@ -15,34 +15,8 @@ windy_url  = 'https://node.windy.com/pois/v2/stations/-3.132/-59.983?token=eyJhb
 # variavel para armazenar data e horário atual
 tempus = datetime.datetime.now()
 
-# Funções Auxiliares de descricao
-# Funçao de descricao dos acidentes
-def descricao_acidentes(subtipo):
-    ty = ''
-    if subtipo == 'ACCIDENT_MINOR':
-        ty = 'Acidente Leve'
-    elif subtipo == 'ACCIDENT_MAJOR':
-        ty = 'Acidente Grave'
-    elif subtipo == 'ROAD_CLOSED_EVENT':
-        ty = 'Via Interditada'
-    elif subtipo == '':
-        ty = 'Não Informado'
-    
-    return ty
-
-# Funçao de descricao do congestionamento
-def descricao_congest(subtipo):
-    ty = ''
-    if subtipo == 'JAM_MODERATE_TRAFFIC':
-        ty = 'Trânsito Moderado'
-    elif subtipo == 'JAM_HEAVY_TRAFFIC':
-        ty = 'Trânsito Intenso'
-    elif subtipo == 'JAM_STAND_STILL_TRAFFIC':
-        ty = 'Trânsito Parado'
-    elif subtipo == '':
-        ty = 'Não Informado'
-    
-    return ty
+# variavel para armazenar data da coleta
+dia_coleta = tempus.strftime("%d-%m-%Y")
 
 # Funçao de descricao dos dias da semana
 def descricao_semana():
@@ -76,20 +50,37 @@ windy = b.json()
 # variaveis que serão exportadas
 acidentes = 0
 congest = 0
-subtipo_acidente = ''
-subtipo_congest = ''
 dia_semana = descricao_semana()
+
+# variaveis de especificacao para acidentes
+grave  = 0
+leve = 0
+interd = 0
+# variaveis de especificacao para congestionamento
+moderado = 0
+intenso = 0
+parado = 0
 
 # amazenar valores às variaveis de exportação
 for row in waze['alerts']:
         
     if row['type'] == 'ACCIDENT':
         acidentes = acidentes + 1
-        subtipo_acidente = descricao_acidentes(row['subtype'])
-
-    if row['type']== 'JAM':
+        if row['subtype'] == 'ACCIDENT_MINOR':
+            leve = leve + 1
+        elif row['subtype'] == 'ACCIDENT_MAJOR':
+            grave  = grave + 1
+        elif row['subtype'] == 'ROAD_CLOSED_EVENT':
+            interd = interd + 1     
+                
+    if row['type'] == 'JAM':
         congest = congest + 1
-        subtipo_congest = descricao_congest(row['subtype'])
+        if row['subtype'] == 'JAM_MODERATE_TRAFFIC':
+            moderado = moderado + 1
+        elif row['subtype'] == 'JAM_HEAVY_TRAFFIC':
+            intenso = intenso + 1
+        elif row['subtype'] == 'JAM_STAND_STILL_TRAFFIC':
+            parado = parado + 1
 
 for row in windy:
     
@@ -99,11 +90,11 @@ for row in windy:
         precipitacao = 0
 
 # mostra na tela variaveis de importação
-print(str(acidentes) + ', ' + subtipo_acidente + ', ' + str(congest) + ', ' + subtipo_congest + ', ' + str(precipitacao) + ', ' + dia_semana)
+print(str(acidentes) + ', ' + str(leve) + ', ' + str(grave) + ', ' + str(interd) + ', ' + str(congest) + ', ' + str(moderado) + ', ' + str(intenso) + ', ' + str(parado) + ', ' + str(precipitacao) + ', ' + dia_semana + ', ' + dia_coleta)
 
 # variavel para armazenar os dados de exportação
 dados = [
-    [acidentes, subtipo_acidente, dia_semana, precipitacao, congest, subtipo_congest]
+    [acidentes, leve, grave, interd, congest, moderado, intenso, parado, precipitacao, dia_semana, dia_coleta]
 ]
 
 # operação para escrever os dados no arquivo csv e confirmar dados salvos no final

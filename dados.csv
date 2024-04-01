@@ -1,2 +1,4 @@
-acidente,tipo_acidente,dia_semana,precip,congest,tipo_congest
-1,Não Informado,Quarta-Feira,0,21,Trânsito Intenso
+acidentes,acidentes_leves,acidentes_graves,vias_interditadas,congest,congest_moderado,congest_intenso,congest_parado,precip,dia_semana,dia_coleta
+1,0,0,0,3,0,0,1,0,Segunda-Feira,01-04-2024
+1,0,0,0,4,0,3,1,0,Segunda-Feira,01-04-2024
+1,0,0,0,5,0,3,1,0,Segunda-Feira,01-04-2024
